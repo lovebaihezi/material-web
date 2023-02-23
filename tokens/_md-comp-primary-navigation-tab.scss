@@ -7,12 +7,14 @@
 @use 'sass:map';
 // go/keep-sorted end
 // go/keep-sorted start
+@use './md-comp-divider';
 @use './md-sys-color';
 @use './md-sys-elevation';
 @use './md-sys-shape';
 @use './md-sys-state';
 @use './md-sys-typescale';
 @use './v0_172/md-comp-primary-navigation-tab';
+@use './values';
 // go/keep-sorted end
 
 $_default: (
@@ -21,9 +23,56 @@ $_default: (
   'md-sys-shape': md-sys-shape.values(),
   'md-sys-state': md-sys-state.values(),
   'md-sys-typescale': md-sys-typescale.values(),
+  'md-comp-divider': md-comp-divider.values(),
 );
 
-$_unsupported-tokens: (
+$supported-tokens: (
+  // go/keep-sorted start
+  'active-focus-icon-color',
+  'active-focus-label-text-color',
+  'active-focus-state-layer-color',
+  'active-focus-state-layer-opacity',
+  'active-hover-icon-color',
+  'active-hover-label-text-color',
+  'active-hover-state-layer-color',
+  'active-hover-state-layer-opacity',
+  'active-icon-color',
+  'active-indicator-color',
+  'active-indicator-height',
+  'active-indicator-shape',
+  'active-label-text-color',
+  'active-pressed-icon-color',
+  'active-pressed-label-text-color',
+  'active-pressed-state-layer-color',
+  'active-pressed-state-layer-opacity',
+  'container-color',
+  'container-elevation',
+  'container-height',
+  'container-shape',
+  'divider-color',
+  'divider-thickness',
+  'focus-icon-color',
+  'focus-label-text-color',
+  'focus-state-layer-color',
+  'focus-state-layer-opacity',
+  'hover-icon-color',
+  'hover-label-text-color',
+  'hover-state-layer-color',
+  'hover-state-layer-opacity',
+  'icon-color',
+  'icon-size',
+  'label-text-color',
+  'label-text-type',
+  'pressed-icon-color',
+  'pressed-label-text-color',
+  'pressed-state-layer-color',
+  'pressed-state-layer-opacity' // go/keep-sorted end
+);
+
+$unsupported-tokens: (
+  // include an icon and the size will adjust;
+  // height is 48 and it's 64 with icon
+  'with-icon-and-label-text-container-height',
   'with-label-text-label-text-font',
   'with-label-text-label-text-line-height',
   'with-label-text-label-text-size',
@@ -36,15 +85,61 @@ $_unsupported-tokens: (
     $deps,
     $exclude-hardcoded-values
   );
-  $tokens: map.remove($tokens, $_unsupported-tokens...);
+
+  // add divider tokens
+  $divider-tokens: map.get($deps, 'md-comp-divider');
+  @each $key, $value in $divider-tokens {
+    $key: 'divider-#{$key}';
+    $tokens: map.set($tokens, $key, $value);
+  }
 
   // TODO(b/271876162): remove when tokens compiler emits typescale tokens
   $tokens: map.merge(
     $tokens,
     (
-      'with-label-text-label-text-type':
-        map.get($deps, 'md-sys-typescale', 'title-small'),
+      'label-text-type': map.get($deps, 'md-sys-typescale', 'title-small'),
     )
   );
+  $tokens: values.validate(
+    $tokens,
+    $supported-tokens: $supported-tokens,
+    $unsupported-tokens: $unsupported-tokens,
+    $renamed-tokens: (
+      // rename inactive-
+      'inactive-focus-state-layer-color': 'focus-state-layer-color',
+      'inactive-focus-state-layer-opacity': 'focus-state-layer-opacity',
+      'inactive-hover-state-layer-color': 'hover-state-layer-color',
+      'inactive-hover-state-layer-opacity': 'hover-state-layer-opacity',
+      'inactive-pressed-state-layer-color': 'pressed-state-layer-color',
+      'inactive-pressed-state-layer-opacity': 'pressed-state-layer-opacity',
+      // rename with-icon- and inactive-
+      'with-icon-active-focus-icon-color': 'active-focus-icon-color',
+      'with-icon-active-hover-icon-color': 'active-hover-icon-color',
+      'with-icon-active-icon-color': 'active-icon-color',
+      'with-icon-active-pressed-icon-color': 'active-pressed-icon-color',
+      'with-icon-icon-size': 'icon-size',
+      'with-icon-inactive-focus-icon-color': 'focus-icon-color',
+      'with-icon-inactive-hover-icon-color': 'hover-icon-color',
+      'with-icon-inactive-icon-color': 'icon-color',
+      'with-icon-inactive-pressed-icon-color': 'pressed-icon-color',
+      // rename with-label-text- and inactive-
+      'with-label-text-active-focus-label-text-color':
+        'active-focus-label-text-color',
+      'with-label-text-active-hover-label-text-color':
+        'active-hover-label-text-color',
+      'with-label-text-active-label-text-color': 'active-label-text-color',
+      'with-label-text-active-pressed-label-text-color':
+        'active-pressed-label-text-color',
+      'with-label-text-inactive-focus-label-text-color':
+        'focus-label-text-color',
+      'with-label-text-inactive-hover-label-text-color':
+        'hover-label-text-color',
+      'with-label-text-inactive-label-text-color': 'label-text-color',
+      'with-label-text-inactive-pressed-label-text-color':
+        'pressed-label-text-color',
+      'with-label-text-label-text-type': 'label-text-type'
+    )
+  );
+
   @return $tokens;
 }

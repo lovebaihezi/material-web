@@ -7,12 +7,15 @@
 @use 'sass:map';
 // go/keep-sorted end
 // go/keep-sorted start
+@use './md-comp-divider';
+@use './md-comp-primary-navigation-tab';
 @use './md-sys-color';
 @use './md-sys-elevation';
 @use './md-sys-shape';
 @use './md-sys-state';
 @use './md-sys-typescale';
 @use './v0_172/md-comp-secondary-navigation-tab';
+@use './values';
 // go/keep-sorted end
 
 $_default: (
@@ -21,9 +24,94 @@ $_default: (
   'md-sys-shape': md-sys-shape.values(),
   'md-sys-state': md-sys-state.values(),
   'md-sys-typescale': md-sys-typescale.values(),
+  'md-comp-divider': md-comp-divider.values(),
 );
 
-$_unsupported-tokens: (
+$supported-tokens: (
+  // go/keep-sorted start
+  // 'active-focus-icon-color',
+  // 'active-focus-label-text-color',
+  // 'active-focus-state-layer-color',
+  // 'active-focus-state-layer-opacity',
+  // 'active-hover-icon-color',
+  // 'active-hover-label-text-color',
+  // 'active-hover-state-layer-color',
+  // 'active-hover-state-layer-opacity',
+  // 'active-icon-color',
+  // 'active-indicator-color',
+  // 'active-indicator-height',
+  // 'active-indicator-shape',
+  // 'active-label-text-color',
+  // 'active-pressed-icon-color',
+  // 'active-pressed-label-text-color',
+  // 'active-pressed-state-layer-color',
+  // 'active-pressed-state-layer-opacity',
+  // 'container-color',
+  // 'container-elevation',
+  // 'container-height',
+  // 'container-shape',
+  // 'divider-color',
+  // 'divider-thickness',
+  // 'focus-icon-color',
+  // 'focus-label-text-color',
+  // 'focus-state-layer-color',
+  // 'focus-state-layer-opacity',
+  // 'hover-icon-color',
+  // 'hover-label-text-color',
+  // 'hover-state-layer-color',
+  // 'hover-state-layer-opacity',
+  // 'icon-color',
+  // 'icon-size',
+  // 'label-text-color',
+  // 'label-text-type',
+  // 'pressed-icon-color',
+  // 'pressed-label-text-color',
+  // 'pressed-state-layer-color',
+  // 'pressed-state-layer-opacity'
+  'active-focus-icon-color',
+  'active-focus-label-text-color',
+  'active-focus-state-layer-color',
+  'active-focus-state-layer-opacity',
+  'active-hover-icon-color',
+  'active-hover-label-text-color',
+  'active-hover-state-layer-color',
+  'active-hover-state-layer-opacity',
+  'active-icon-color',
+  'active-indicator-color',
+  'active-indicator-height',
+  'active-indicator-shape',
+  'active-label-text-color',
+  'active-pressed-icon-color',
+  'active-pressed-label-text-color',
+  'active-pressed-state-layer-color',
+  'active-pressed-state-layer-opacity',
+  'container-color',
+  'container-elevation',
+  'container-height',
+  'container-shape',
+  'divider-color',
+  'divider-thickness',
+  'focus-icon-color',
+  'focus-label-text-color',
+  'focus-state-layer-color',
+  'focus-state-layer-opacity',
+  'hover-icon-color',
+  'hover-label-text-color',
+  'hover-state-layer-color',
+  'hover-state-layer-opacity',
+  'icon-color',
+  'icon-size',
+  'label-text-color',
+  'label-text-type',
+  'pressed-icon-color',
+  'pressed-label-text-color',
+  'pressed-state-layer-color',
+  'pressed-state-layer-opacity',
+  // go/keep-sorted end
+);
+
+$unsupported-tokens: (
+  'container-shadow-color',
   'label-text-font',
   'label-text-line-height',
   'label-text-size',
@@ -36,13 +124,58 @@ $_unsupported-tokens: (
     $deps,
     $exclude-hardcoded-values
   );
-  $tokens: map.remove($tokens, $_unsupported-tokens...);
-  // TODO(b/271876162): remove when tokens compiler emits typescale tokens
+
+  // add divider tokens
+  $divider-tokens: map.get($deps, 'md-comp-divider');
+  @each $key, $value in $divider-tokens {
+    $key: 'divider-#{$key}';
+    $tokens: map.set($tokens, $key, $value);
+  }
+
   $tokens: map.merge(
     $tokens,
     (
-      'with-label-text-label-text-type':
-        map.get($deps, 'md-sys-typescale', 'title-small'),
+      // TODO(b/271876162): remove when tokens compiler emits typescale tokens
+      'label-text-type': map.get($deps, 'md-sys-typescale', 'title-small'),
+      // add missing secondary tokens.
+      'active-focus-icon-color': map.get($tokens, 'icon-color'),
+      'active-focus-label-text-color':
+        map.get($tokens, 'active-label-text-color'),
+      'active-focus-state-layer-color':
+        map.get($tokens, 'focus-state-layer-color'),
+      'active-focus-state-layer-opacity':
+        map.get($tokens, 'focus-state-layer-opacity'),
+      'active-hover-icon-color': map.get($tokens, 'icon-color'),
+      'active-hover-label-text-color':
+        map.get($tokens, 'active-label-text-color'),
+      'active-hover-state-layer-color':
+        map.get($tokens, 'hover-state-layer-color'),
+      'active-hover-state-layer-opacity':
+        map.get($tokens, 'hover-state-layer-opacity'),
+      'active-icon-color': map.get($tokens, 'icon-color'),
+      'active-indicator-shape': 0,
+      'active-pressed-icon-color': map.get($tokens, 'icon-color'),
+      'active-pressed-label-text-color':
+        map.get($tokens, 'active-label-text-color'),
+      'active-pressed-state-layer-color':
+        map.get($tokens, 'pressed-state-layer-color'),
+      'active-pressed-state-layer-opacity':
+        map.get($tokens, 'pressed-state-layer-opacity')
+    )
+  );
+
+  $tokens: values.validate(
+    $tokens,
+    $supported-tokens: $supported-tokens,
+    $unsupported-tokens: $unsupported-tokens,
+    $renamed-tokens: (
+      'inactive-label-text-color': 'label-text-color',
+      'with-icon-active-icon-color': 'active-icon-color',
+      'with-icon-focus-icon-color': 'focus-icon-color',
+      'with-icon-hover-icon-color': 'hover-icon-color',
+      'with-icon-icon-size': 'icon-size',
+      'with-icon-inactive-icon-color': 'icon-color',
+      'with-icon-pressed-icon-color': 'pressed-icon-color',
     )
   );
   @return $tokens;

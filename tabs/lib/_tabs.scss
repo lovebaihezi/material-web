@@ -1,0 +1,64 @@
+//
+// Copyright 2023 Google LLC
+// SPDX-License-Identifier: Apache-2.0
+//
+
+// go/keep-sorted start
+// go/keep-sorted end
+
+// Note, there are currently no tokens for tabs. Instead, tabs are entirely
+// themed via primary/secondary tab.
+@mixin styles() {
+  :host {
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    position: relative;
+    padding: 8px;
+  }
+
+  // :host([variant~='wide']:not([variant~='vertical'])) {
+  //   border-radius: 9999px;
+  // }
+
+  :host([variant~='vertical']) {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0px;
+  }
+
+  // :host([variant~='vertical'][variant~='navigation']) {
+  //   padding-inline: 12px;
+  // }
+
+  // :host([variant~='vertical'][variant~='navigation'][variant~='wide']) {
+  //   gap: 0px;
+  //   padding-block: 12px;
+  //   padding-inline: 28px;
+  // }
+
+  // :host([hidden]) {
+  //   display: none;
+  // }
+
+  :host::-webkit-scrollbar {
+    display: none;
+  }
+
+  :host(:not([variant~='vertical'])) ::slotted(*) {
+    flex: 1;
+  }
+
+  ::slotted([selected]) {
+    z-index: 1;
+  }
+
+  ::slotted(:focus-within) {
+    z-index: 2;
+  }
+}

@@ -376,6 +376,10 @@ export class Dialog extends LitElement {
   protected async performTransition(shouldDispatchAction: boolean) {
     // TODO: pause here only to avoid a double update warning.
     await this.updateComplete;
+    // Focus initial element.
+    if (this.open) {
+      this.focus();
+    }
     this.showingOpen = this.open;
     if (shouldDispatchAction) {
       this.dispatchActionEvent(this.open ? 'opening' : 'closing');
@@ -411,10 +415,6 @@ export class Dialog extends LitElement {
       if (!this.modeless) {
         Dialog.setDocumentScrollingDisabled(this.open);
       }
-    }
-    // Focus initial element.
-    if (this.open) {
-      this.focus();
     }
     if (shouldDispatchAction) {
       this.dispatchActionEvent(this.open ? 'opened' : 'closed');
